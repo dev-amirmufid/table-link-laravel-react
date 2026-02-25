@@ -83,7 +83,6 @@ Access Swagger UI at: `http://localhost:8000/api/docs`
 | GET | `/api/v1/dashboard/user-type-distribution` | Get user type distribution |
 | GET | `/api/v1/dashboard/user-classification` | Get user classification |
 | GET | `/api/v1/transactions` | Get all transactions |
-| POST | `/api/auth/login` | Admin login |
 
 ## Project Structure
 
