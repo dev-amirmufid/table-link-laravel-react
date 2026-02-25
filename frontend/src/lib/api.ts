@@ -53,9 +53,9 @@ export const dashboardApi = {
 
 // Transaction API (public - no auth required)
 export const transactionApi = {
-  getAll: (filters?: DashboardFilters, perPage = 15) =>
+  getAll: (filters?: DashboardFilters, perPage = 15, page = 1) =>
     api.get<{ success: boolean; data: PaginatedResponse<Transaction> }>('/v1/transactions', {
-      params: { ...filters, per_page: perPage },
+      params: { ...filters, per_page: perPage, page },
     }),
 
   getById: (id: string) =>

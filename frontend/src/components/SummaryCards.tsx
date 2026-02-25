@@ -1,13 +1,40 @@
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { DollarSign, ShoppingCart, Package, TrendingUp } from 'lucide-react'
 import type { Summary } from '@/types'
 
 interface SummaryCardsProps {
-  data: Summary
+  data: Summary | null
+  isLoading?: boolean
 }
 
-export function SummaryCards({ data }: SummaryCardsProps) {
+export function SummaryCards({ data, isLoading }: SummaryCardsProps) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between space-x-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-32" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <Skeleton className="h-12 w-12 rounded-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  if (!data) {
+    return null
+  }
+
   const cards = [
     {
       title: 'Total Revenue',

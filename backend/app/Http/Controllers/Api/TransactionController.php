@@ -29,6 +29,9 @@ class TransactionController extends Controller
     {
         $filters = $this->filterService->getFilters($request);
         $perPage = $request->input('per_page', 15);
+        
+        // Ensure perPage is reasonable for performance
+        $perPage = min($perPage, 100);
 
         $data = $this->transactionRepository->getAll($filters, $perPage);
 
