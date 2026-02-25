@@ -5,7 +5,6 @@ import {
   setFilters
 } from '@/store/slices/dashboardSlice'
 import { useTheme } from '@/contexts/ThemeContext'
-import { exportToCSV } from '@/lib/csv'
 import type { DashboardFilters } from '@/types'
 import { FilterBar } from '@/components/FilterBar'
 import { SummaryCards } from '@/components/SummaryCards'
@@ -19,7 +18,7 @@ import { TransactionsTable } from '@/components/TransactionsTable'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Moon, Sun, Download, RefreshCw } from 'lucide-react'
+import { Moon, Sun, RefreshCw } from 'lucide-react'
 
 export function Dashboard() {
   const dispatch = useAppDispatch()
@@ -43,20 +42,6 @@ export function Dashboard() {
 
   const handleFilterChange = (newFilters: DashboardFilters) => {
     dispatch(setFilters(newFilters))
-  }
-
-  const handleExportCSV = () => {
-    if (!trends.length) return
-    
-    exportToCSV(trends.map(t => ({
-      period: t.period,
-      transactions: t.transactions,
-      revenue: t.revenue,
-    })), 'transaction-trends', [
-      { key: 'period', header: 'Period' },
-      { key: 'transactions', header: 'Transactions' },
-      { key: 'revenue', header: 'Revenue' },
-    ])
   }
 
   const handleRefresh = () => {
@@ -87,10 +72,7 @@ export function Dashboard() {
           >
             <RefreshCw className={`h-4 w-4 ${isAnyLoading ? 'animate-spin' : ''}`} />
           </Button>
-          <Button variant="outline" size="sm" onClick={handleExportCSV}>
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+
         </div>
       </div>
 
@@ -200,13 +182,13 @@ export function Dashboard() {
         </Card>
       </div>
 
-      {/* Transactions Table */}
+      {/* Transactions Table - Unified filtering with dashboard */}
       <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
         </CardHeader>
         <CardContent>
-          <TransactionsTable />
+          <TransactionsTable filters={filters} />
         </CardContent>
       </Card>
     </div>

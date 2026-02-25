@@ -130,6 +130,7 @@ const dashboardSlice = createSlice({
       state.loading.trendingItems = true
       state.loading.userClassification = true
       state.loading.relations = true
+      state.loading.revenueContribution = true
     })
     builder.addCase(fetchDashboardAnalytics.fulfilled, (state, action) => {
       state.loading.summary = false
@@ -137,6 +138,7 @@ const dashboardSlice = createSlice({
       state.loading.trendingItems = false
       state.loading.userClassification = false
       state.loading.relations = false
+      state.loading.revenueContribution = false
 
       // Map data from single response
       if (action.payload.summary) {
@@ -173,7 +175,6 @@ const dashboardSlice = createSlice({
           revenue: Number(r.revenue),
           percentage: r.percentage,
         }))
-        state.loading.revenueContribution = false
       }
     })
     builder.addCase(fetchDashboardAnalytics.rejected, (state, action) => {
@@ -182,6 +183,7 @@ const dashboardSlice = createSlice({
       state.loading.trendingItems = false
       state.loading.userClassification = false
       state.loading.relations = false
+      state.loading.revenueContribution = false
       state.error = action.payload as string
     })
   },

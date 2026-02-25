@@ -563,27 +563,28 @@ class AnalyticsController extends Controller
     )]
     public function analytics(Request $request): JsonResponse
     {
-        $filters = $this->filterService->getFilters($request);
-        $include = $request->input('include', 'summary,trends,trending_items,user_classification,top_buyers,top_sellers,revenue_contribution');
-        $period = $request->input('period', 'daily');
-        $limit = $request->input('limit', 10);
+        try {
+            $filters = $this->filterService->getFilters($request);
+            $include = $request->input('include', 'summary,trends,trending_items,user_classification,top_buyers,top_sellers,revenue_contribution');
+            $period = $request->input('period', 'daily');
+            $limit = $request->input('limit', 10);
 
-        // Parse include parameter
-        $includeArray = array_map('trim', explode(',', strtolower($include)));
+            // Parse include parameter
+            $includeArray = array_map('trim', explode(',', strtolower($include)));
 
-        // Validate period
-        if (!in_array($period, ['daily', 'weekly', 'monthly'])) {
-            $period = 'daily';
-        }
+            // Validate period
+            if (!in_array($period, ['daily', 'weekly', 'monthly'])) {
+                $period = 'daily';
+            }
 
-        // Build cache key based on all parameters
-        $cacheKey = $this->generateCacheKey('dashboard.analytics', $filters, [
-            'include' => $include,
-            'period' => $period,
-            'limit' => $limit,
-        ]);
+            // Build cache key based on all parameters
+            $cacheKey = $this->generateCacheKey('dashboard.analytics', $filters, [
+                'include' => $include,
+                'period' => $period,
+                'limit' => $limit,
+            ]);
 
-        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($filters, $includeArray, $period, $limit) {
+            $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($filters, $includeArray, $period, $limit) {
             // Prepare filter conditions for raw SQL
             $whereConditions = [];
             $joinConditions = [];
@@ -771,5 +772,32 @@ class AnalyticsController extends Controller
             'include' => $includeArray,
             'cached' => Cache::has($cacheKey),
         ]);
+        } catch (\Throwable $e) {
+            // Log the error for debugging
+            \Illuminate\Support\Facades\Log::error('Dashboard Analytics Error: ' . $e->getMessage(), [
+                'filters' => $filters,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Return empty data structure on error - never crash
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch dashboard analytics',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+                'data' => [
+                    'summary' => null,
+                    'trends' => [],
+                    'trending_items' => [],
+                    'user_classification' => [],
+                    'top_buyers' => [],
+                    'top_sellers' => [],
+                    'revenue_contribution' => [],
+                ],
+                'period' => $period,
+                'limit' => $limit,
+                'include' => $includeArray,
+                'cached' => false,
+            ], 200); // Return 200 with error info so frontend can handle gracefully
+        }
     }
 }

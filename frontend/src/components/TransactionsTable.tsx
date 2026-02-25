@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { format } from 'date-fns'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { 
@@ -7,8 +7,7 @@ import {
   setSort, 
   setPage, 
   setPerPage,
-  setSelectedTransaction,
-  setFilters as setTransactionFilters
+  setSelectedTransaction
 } from '@/store/slices/transactionsSlice'
 import { formatCurrency } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,7 +23,11 @@ import {
   ArrowDown,
   X
 } from 'lucide-react'
-import type { Transaction } from '@/types'
+import type { Transaction, DashboardFilters } from '@/types'
+
+interface TransactionsTableProps {
+  filters?: DashboardFilters
+}
 
 // Modal Component
 function TransactionModal({ 
@@ -91,7 +94,7 @@ function TransactionModal({
   )
 }
 
-export function TransactionsTable() {
+export function TransactionsTable({ filters: externalFilters }: TransactionsTableProps) {
   const dispatch = useAppDispatch()
   const { 
     items, 
@@ -103,20 +106,16 @@ export function TransactionsTable() {
     sortField, 
     sortOrder,
     selectedTransaction,
-    loading,
-    filters: transactionFilters
+    loading
   } = useAppSelector((state) => state.transactions)
   
-  // Get filters from dashboard
-  const dashboardFilters = useAppSelector((state) => state.dashboard.filters)
+  // Use filters from props (unified with dashboard) or default to empty
+  const effectiveFilters = externalFilters ?? {}
   
   // Local state for debounced search
   const [searchInput, setSearchInput] = useState(search)
-
-  // Sync dashboard filters to transactions
-  useEffect(() => {
-    dispatch(setTransactionFilters(dashboardFilters))
-  }, [dispatch, dashboardFilters])
+  
+  const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Debounce search
   useEffect(() => {
@@ -130,17 +129,31 @@ export function TransactionsTable() {
     return () => clearTimeout(timer)
   }, [searchInput, search, dispatch])
 
-  // Fetch transactions when parameters change
+  // Fetch transactions when parameters change - with debounce to prevent rapid clicks
   useEffect(() => {
-    dispatch(fetchTransactions({ 
-      filters: transactionFilters, 
-      page: currentPage, 
-      perPage, 
-      search,
-      sortField: sortField as string,
-      sortOrder 
-    }))
-  }, [dispatch, currentPage, perPage, search, sortField, sortOrder, transactionFilters])
+    // Clear existing timer if any
+    if (fetchTimerRef.current) {
+      clearTimeout(fetchTimerRef.current)
+    }
+    
+    // Debounce the fetch to handle rapid pagination/filter clicks
+    fetchTimerRef.current = setTimeout(() => {
+      dispatch(fetchTransactions({ 
+        filters: effectiveFilters, 
+        page: currentPage, 
+        perPage, 
+        search,
+        sortField: sortField as string,
+        sortOrder 
+      }))
+    }, 300)
+    
+    return () => {
+      if (fetchTimerRef.current) {
+        clearTimeout(fetchTimerRef.current)
+      }
+    }
+  }, [dispatch, currentPage, perPage, search, sortField, sortOrder, effectiveFilters])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value)

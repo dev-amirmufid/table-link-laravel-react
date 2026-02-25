@@ -43,18 +43,38 @@ class TransactionController extends Controller
     )]
     public function index(Request $request): JsonResponse
     {
-        $filters = $this->filterService->getFilters($request);
-        $perPage = $request->input('per_page', 15);
-        
-        // Ensure perPage is reasonable for performance
-        $perPage = min($perPage, 100);
+        try {
+            $filters = $this->filterService->getFilters($request);
+            $perPage = $request->input('per_page', 15);
+            
+            // Ensure perPage is reasonable for performance
+            $perPage = min($perPage, 100);
 
-        $data = $this->transactionRepository->getAll($filters, $perPage);
+            $data = $this->transactionRepository->getAll($filters, $perPage);
 
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Transaction Index Error: ' . $e->getMessage(), [
+                'filters' => $filters ?? [],
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch transactions',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+                'data' => [
+                    'data' => [],
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'per_page' => $perPage ?? 15,
+                    'total' => 0,
+                ],
+            ], 200);
+        }
     }
 
     /**

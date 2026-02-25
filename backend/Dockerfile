@@ -1,7 +1,7 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm-alpine
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     git \
     curl \
     libpng-dev \
@@ -11,10 +11,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     nodejs \
-    npm
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    npm \
+    fcgi \
+    supervisor
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
@@ -23,16 +22,24 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /var/www/backend
 
-# Copy existing application directory contents
-COPY . /var/www/html
+# Copy application files
+COPY . .
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install dependencies and optimize
+RUN composer install --no-dev --optimize-autoloader \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && chmod -R 755 storage bootstrap/cache \
+    && chown -R www-data:www-data .
 
-# Expose port
-EXPOSE 8000
+# Copy supervisor configuration
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Start Laravel server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Expose port 9000 (PHP-FPM)
+EXPOSE 9000
+
+# Start supervisor (manages PHP-FPM)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

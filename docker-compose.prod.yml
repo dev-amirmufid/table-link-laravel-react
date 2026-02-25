@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tablelink_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tablelink_dashboard
+      MYSQL_USER: tablelink
+      MYSQL_PASSWORD: tablelink_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - tablelink_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tablelink_backend
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=tablelink_dashboard
+      - DB_USERNAME=tablelink
+      - DB_PASSWORD=tablelink_password
+    expose:
+      - "9000"
+    volumes:
+      - backend_storage:/var/www/backend/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - tablelink_network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tablelink_frontend
+    environment:
+      - VITE_API_URL=http://localhost/api/v1
+    expose:
+      - "80"
+    networks:
+      - tablelink_network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: tablelink_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - tablelink_network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  backend_storage:
+
+networks:
+  tablelink_network:
+    driver: bridge
