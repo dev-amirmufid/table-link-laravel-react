@@ -28,7 +28,7 @@ const initialState: TransactionsState = {
   sortOrder: 'desc',
   selectedTransaction: null,
   filters: {},
-  loading: false,
+  loading: true,
   error: null,
 }
 

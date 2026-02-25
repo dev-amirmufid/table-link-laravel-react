@@ -28,11 +28,11 @@ const initialState: DashboardState = {
   userTypeDistribution: [],
   filters: { period: 'daily' },
   loading: {
-    summary: false,
-    trends: false,
-    topBuyers: false,
-    topSellers: false,
-    userTypeDistribution: false,
+    summary: true,
+    trends: true,
+    topBuyers: true,
+    topSellers: true,
+    userTypeDistribution: true,
   },
   error: null,
 }
