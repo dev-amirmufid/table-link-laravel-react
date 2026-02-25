@@ -26,6 +26,11 @@ interface PriceDistribution {
   revenue: number
 }
 
+interface UserClassification {
+  type: string
+  count: number
+}
+
 interface DashboardState {
   summary: Summary | null
   trends: Trend[]
@@ -33,6 +38,7 @@ interface DashboardState {
   topBuyers: TopUser[]
   topSellers: TopUser[]
   userTypeDistribution: UserTypeDistribution[]
+  userClassification: UserClassification[]
   topItems: TopItem[]
   topItemsStatistics: { total_revenue: number; total_transactions: number } | null
   priceDistribution: PriceDistribution[]
@@ -44,6 +50,7 @@ interface DashboardState {
     topBuyers: boolean
     topSellers: boolean
     userTypeDistribution: boolean
+    userClassification: boolean
     topItems: boolean
     priceDistribution: boolean
   }
@@ -57,6 +64,7 @@ const initialState: DashboardState = {
   topBuyers: [],
   topSellers: [],
   userTypeDistribution: [],
+  userClassification: [],
   topItems: [],
   topItemsStatistics: null,
   priceDistribution: [],
@@ -68,6 +76,7 @@ const initialState: DashboardState = {
     topBuyers: true,
     topSellers: true,
     userTypeDistribution: true,
+    userClassification: true,
     topItems: true,
     priceDistribution: true,
   },
@@ -164,6 +173,18 @@ export const fetchPriceDistribution = createAsyncThunk(
       }
     } catch {
       return rejectWithValue('Failed to fetch price distribution')
+    }
+  }
+)
+
+export const fetchUserClassification = createAsyncThunk(
+  'dashboard/fetchUserClassification',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await dashboardApi.getUserClassification()
+      return response.data.data
+    } catch {
+      return rejectWithValue('Failed to fetch user classification')
     }
   }
 )
@@ -271,6 +292,19 @@ const dashboardSlice = createSlice({
     })
     builder.addCase(fetchPriceDistribution.rejected, (state, action) => {
       state.loading.priceDistribution = false
+      state.error = action.payload as string
+    })
+
+    // User Classification
+    builder.addCase(fetchUserClassification.pending, (state) => {
+      state.loading.userClassification = true
+    })
+    builder.addCase(fetchUserClassification.fulfilled, (state, action) => {
+      state.loading.userClassification = false
+      state.userClassification = action.payload
+    })
+    builder.addCase(fetchUserClassification.rejected, (state, action) => {
+      state.loading.userClassification = false
       state.error = action.payload as string
     })
   },

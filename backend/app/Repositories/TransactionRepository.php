@@ -128,15 +128,15 @@ class TransactionRepository
         $query = $this->getBaseQuery($filters);
 
         // Use database-agnostic date formatting
-        $dateExpression = match ($period) {
-            'daily' => DB::raw('DATE(created_at)'),
-            'weekly' => DB::raw('YEARWEEK(created_at)'),
-            'monthly' => DB::raw('DATE_FORMAT(created_at, "%Y-%m")'),
-            default => DB::raw('DATE(created_at)'),
+        $dateSelect = match ($period) {
+            'daily' => 'DATE(created_at) as date',
+            'weekly' => 'YEARWEEK(created_at) as date',
+            'monthly' => 'DATE_FORMAT(created_at, "%Y-%m") as date',
+            default => 'DATE(created_at) as date',
         };
 
         return $query
-            ->select($dateExpression . ' as date')
+            ->selectRaw($dateSelect)
             ->selectRaw('COUNT(*) as count')
             ->selectRaw('SUM(quantity * price) as revenue')
             ->groupBy('date')

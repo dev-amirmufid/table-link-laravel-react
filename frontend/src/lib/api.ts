@@ -60,6 +60,9 @@ export const dashboardApi = {
   getUserClassification: () =>
     api.get<{ success: boolean; data: any[] }>('/v1/dashboard/user-classification'),
 
+  clearCache: () =>
+    api.post<{ success: boolean; message: string }>('/v1/dashboard/cache/clear'),
+
   getTopItems: (filters?: DashboardFilters, limit = 10) =>
     api.get<{ 
       success: boolean; 

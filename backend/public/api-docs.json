@@ -5,15 +5,13 @@
         "description": "API Documentation for Transaction Dashboard",
         "version": "1.0"
     },
+    "servers": [
+        {
+            "url": "/api/v1"
+        }
+    ],
     "paths": {
-        "/": {
-            "servers": [
-                {
-                    "url": "http://localhost:8000/api/v1",
-                    "description": "API Server"
-                }
-            ]
-        },
+        "/": {},
         "/auth/register": {
             "post": {
                 "tags": [

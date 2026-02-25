@@ -15,10 +15,6 @@ use OpenApi\Attributes as OA;
     version: "1.0",
     description: "API Documentation for Transaction Dashboard"
 )]
-#[OA\Server(
-    url: "http://localhost:8000/api/v1",
-    description: "API Server"
-)]
 #[OA\PathItem(path: "/")]
 class DashboardController extends Controller
 {

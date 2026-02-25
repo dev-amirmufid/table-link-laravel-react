@@ -52,7 +52,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   return null
 }
 
-export function ItemPerformanceChart({ data, statistics, title }: ItemPerformanceChartProps) {
+export function ItemPerformanceChart({ data, title }: ItemPerformanceChartProps) {
   const chartData = data.map(item => ({
     name: item.item_name.length > 15 ? item.item_name.substring(0, 15) + '...' : item.item_name,
     revenue: item.total_revenue,
@@ -67,18 +67,6 @@ export function ItemPerformanceChart({ data, statistics, title }: ItemPerformanc
     <div className="w-full">
       {title && <h3 className="text-lg font-semibold mb-4">{title}</h3>}
       
-      {statistics && (
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-muted/50 rounded-lg p-3">
-            <p className="text-xs text-muted-foreground">Total Revenue</p>
-            <p className="text-lg font-semibold">{formatCurrency(statistics.total_revenue)}</p>
-          </div>
-          <div className="bg-muted/50 rounded-lg p-3">
-            <p className="text-xs text-muted-foreground">Total Transactions</p>
-            <p className="text-lg font-semibold">{formatNumber(statistics.total_transactions)}</p>
-          </div>
-        </div>
-      )}
 
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -96,7 +84,7 @@ export function ItemPerformanceChart({ data, statistics, title }: ItemPerformanc
             />
             <YAxis
               type="category"
-              dataKey="name"
+              dataKey="itemCode"
               tick={{ fontSize: 11 }}
               className="fill-muted-foreground"
               width={80}

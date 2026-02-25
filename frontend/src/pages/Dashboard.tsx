@@ -6,6 +6,7 @@ import {
   fetchTopBuyers, 
   fetchTopSellers, 
   fetchUserTypeDistribution,
+  fetchUserClassification,
   fetchTopItems,
   fetchPriceDistribution,
   setFilters 
@@ -36,10 +37,9 @@ export function Dashboard() {
     topBuyers, 
     topSellers, 
     userTypeDistribution, 
+    userClassification,
     topItems,
-    topItemsStatistics,
     priceDistribution,
-    priceDistributionStatistics,
     filters, 
     loading 
   } = useAppSelector((state) => state.dashboard)
@@ -51,6 +51,7 @@ export function Dashboard() {
     dispatch(fetchTopBuyers({ filters, limit: 10 }))
     dispatch(fetchTopSellers({ filters, limit: 10 }))
     dispatch(fetchUserTypeDistribution(filters))
+    dispatch(fetchUserClassification())
     dispatch(fetchTopItems({ filters, limit: 10 }))
     dispatch(fetchPriceDistribution(filters))
   }, [dispatch, filters])
@@ -79,6 +80,7 @@ export function Dashboard() {
     dispatch(fetchTopBuyers({ filters, limit: 10 }))
     dispatch(fetchTopSellers({ filters, limit: 10 }))
     dispatch(fetchUserTypeDistribution(filters))
+    dispatch(fetchUserClassification())
     dispatch(fetchTopItems({ filters, limit: 10 }))
     dispatch(fetchPriceDistribution(filters))
   }
@@ -187,6 +189,32 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* User Classification */}
+        <Card>
+          <CardHeader>
+            <CardTitle>User Classification</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading.userClassification ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {userClassification.map((item) => (
+                  <div key={item.type} className="flex justify-between items-center p-4 border rounded-lg">
+                    <div className="font-medium capitalize">{item.type}</div>
+                    <div className="text-2xl font-bold">{item.count}</div>
+                  </div>
+                ))}
+                {userClassification.length === 0 && (
+                  <p className="text-muted-foreground text-center">No data available</p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Item Performance - Top Items by Revenue */}
         <Card>
           <CardHeader>
@@ -200,7 +228,6 @@ export function Dashboard() {
             ) : (
               <ItemPerformanceChart 
                 data={topItems} 
-                statistics={topItemsStatistics}
               />
             )}
           </CardContent>
@@ -219,7 +246,6 @@ export function Dashboard() {
             ) : (
               <PriceDistributionChart 
                 data={priceDistribution}
-                statistics={priceDistributionStatistics}
               />
             )}
           </CardContent>
