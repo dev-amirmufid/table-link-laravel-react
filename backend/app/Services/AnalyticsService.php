@@ -32,10 +32,10 @@ class AnalyticsService
 
         return Cache::remember($cacheKey, 300, function () use ($filters) {
             return [
-                'total_revenue' => $this->transactionRepository->getTotalRevenue($filters),
-                'total_transactions' => $this->transactionRepository->getTotalTransactions($filters),
-                'total_quantity' => $this->transactionRepository->getTotalQuantity($filters),
-                'average_price' => $this->transactionRepository->getAveragePrice($filters),
+                'total_revenue' => $this->transactionRepository->aggregateTotalRevenue($filters),
+                'total_transactions' => $this->transactionRepository->aggregateTotalTransactions($filters),
+                'total_quantity' => $this->transactionRepository->aggregateTotalQuantity($filters),
+                'average_price' => $this->transactionRepository->aggregateAveragePrice($filters),
             ];
         });
     }
@@ -48,7 +48,7 @@ class AnalyticsService
         $cacheKey = 'analytics_trends_' . md5(serialize($filters) . $period);
 
         return Cache::remember($cacheKey, 300, function () use ($filters, $period) {
-            return $this->transactionRepository->getTrends($filters, $period);
+            return $this->transactionRepository->aggregateTrends($filters, $period);
         });
     }
 
@@ -72,7 +72,7 @@ class AnalyticsService
         $cacheKey = 'analytics_top_buyers_' . md5(serialize($filters)) . $limit;
 
         return Cache::remember($cacheKey, 300, function () use ($limit, $filters) {
-            return $this->transactionRepository->getTopBuyers($limit, $filters);
+            return $this->transactionRepository->aggregateTopBuyers($limit, $filters);
         });
     }
 
@@ -84,7 +84,7 @@ class AnalyticsService
         $cacheKey = 'analytics_top_sellers_' . md5(serialize($filters)) . $limit;
 
         return Cache::remember($cacheKey, 300, function () use ($limit, $filters) {
-            return $this->transactionRepository->getTopSellers($limit, $filters);
+            return $this->transactionRepository->aggregateTopSellers($limit, $filters);
         });
     }
 
@@ -96,7 +96,7 @@ class AnalyticsService
         $cacheKey = 'analytics_user_type_distribution_' . md5(serialize($filters));
 
         return Cache::remember($cacheKey, 300, function () use ($filters) {
-            return $this->transactionRepository->getUserTypeDistribution($filters);
+            return $this->transactionRepository->aggregateUserTypeDistribution($filters);
         });
     }
 
@@ -120,7 +120,7 @@ class AnalyticsService
         $cacheKey = 'analytics_top_items_' . md5(serialize($filters)) . $limit;
 
         return Cache::remember($cacheKey, 300, function () use ($limit, $filters) {
-            return $this->transactionRepository->getTopItemsByRevenue($limit, $filters);
+            return $this->transactionRepository->aggregateTopItemsByRevenue($limit, $filters);
         });
     }
 
@@ -132,7 +132,7 @@ class AnalyticsService
         $cacheKey = 'analytics_price_distribution_' . md5(serialize($filters));
 
         return Cache::remember($cacheKey, 300, function () use ($filters) {
-            return $this->transactionRepository->getPriceDistribution($filters);
+            return $this->transactionRepository->aggregatePriceDistribution($filters);
         });
     }
 

@@ -2,54 +2,25 @@
 
 namespace App\Services;
 
+use App\Filters\DashboardFilter;
 use Illuminate\Http\Request;
 
 class FilterService
 {
+    protected DashboardFilter $dashboardFilter;
+
+    public function __construct(DashboardFilter $dashboardFilter)
+    {
+        $this->dashboardFilter = $dashboardFilter;
+    }
+
     /**
      * Extract and validate filter parameters from request
+     * Uses DashboardFilter as single source of truth
      */
     public function getFilters(Request $request): array
     {
-        $filters = [];
-
-        // Date range filters
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $filters['start_date'] = $request->input('start_date');
-            $filters['end_date'] = $request->input('end_date');
-        }
-
-        // Period filter (daily, weekly, monthly)
-        if ($request->has('period')) {
-            $filters['period'] = $request->input('period');
-        }
-
-        // User type filter
-        if ($request->has('user_type')) {
-            $filters['user_type'] = $request->input('user_type');
-        }
-
-        // Item ID filter
-        if ($request->has('item_id')) {
-            $filters['item_id'] = $request->input('item_id');
-        }
-
-        // Buyer ID filter
-        if ($request->has('buyer_id')) {
-            $filters['buyer_id'] = $request->input('buyer_id');
-        }
-
-        // Seller ID filter
-        if ($request->has('seller_id')) {
-            $filters['seller_id'] = $request->input('seller_id');
-        }
-
-        // Search filter
-        if ($request->has('search')) {
-            $filters['search'] = $request->input('search');
-        }
-
-        return $filters;
+        return $this->dashboardFilter->filters($request);
     }
 
     /**
@@ -72,7 +43,7 @@ class FilterService
             $start = new \DateTime($startDate);
             $end = new \DateTime($endDate);
             return $start <= $end;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
     }

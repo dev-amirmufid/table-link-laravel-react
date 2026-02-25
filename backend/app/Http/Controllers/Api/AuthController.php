@@ -9,29 +9,34 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use OpenApi\Attributes as OA;
 
 class AuthController extends Controller
 {
     /**
      * Register a new user
-     * @OA\Post(
-     *      path="/auth/register",
-     *      tags={"Authentication"},
-     *      summary="Register a new user",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          @OA\JsonContent(
-     *              required={"name","email","password"},
-     *              @OA\Property(property="name", type="string"),
-     *              @OA\Property(property="email", type="string"),
-     *              @OA\Property(property="password", type="string"),
-     *              @OA\Property(property="type", type="string", enum={"domestic", "foreign"})
-     *          )
-     *      ),
-     *      @OA\Response(response=201, description="User registered successfully"),
-     *      @OA\Response(response=400, description="Validation error")
-     * )
      */
+    #[OA\Post(
+        path: "/auth/register",
+        tags: ["Authentication"],
+        summary: "Register a new user",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["name", "email", "password"],
+                properties: [
+                    new OA\Property(property: "name", type: "string"),
+                    new OA\Property(property: "email", type: "string"),
+                    new OA\Property(property: "password", type: "string"),
+                    new OA\Property(property: "type", type: "string", enum: ["domestic", "foreign"])
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: "User registered successfully"),
+            new OA\Response(response: 400, description: "Validation error")
+        ]
+    )]
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -71,22 +76,26 @@ class AuthController extends Controller
 
     /**
      * Login user
-     * @OA\Post(
-     *      path="/auth/login",
-     *      tags={"Authentication"},
-     *      summary="Login user",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          @OA\JsonContent(
-     *              required={"email","password"},
-     *              @OA\Property(property="email", type="string"),
-     *              @OA\Property(property="password", type="string")
-     *          )
-     *      ),
-     *      @OA\Response(response=200, description="Login successful"),
-     *      @OA\Response(response=401, description="Invalid credentials")
-     * )
      */
+    #[OA\Post(
+        path: "/auth/login",
+        tags: ["Authentication"],
+        summary: "Login user",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["email", "password"],
+                properties: [
+                    new OA\Property(property: "email", type: "string"),
+                    new OA\Property(property: "password", type: "string")
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Login successful"),
+            new OA\Response(response: 401, description: "Invalid credentials")
+        ]
+    )]
     public function login(Request $request): JsonResponse
     {
         $credentials = $request->only('email', 'password');
@@ -112,15 +121,17 @@ class AuthController extends Controller
 
     /**
      * Logout user
-     * @OA\Post(
-     *      path="/auth/logout",
-     *      tags={"Authentication"},
-     *      summary="Logout user",
-     *      security={{"bearerAuth":{}}},
-     *      @OA\Response(response=200, description="Logout successful"),
-     *      @OA\Response(response=401, description="Unauthorized")
-     * )
      */
+    #[OA\Post(
+        path: "/auth/logout",
+        tags: ["Authentication"],
+        summary: "Logout user",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(response: 200, description: "Logout successful"),
+            new OA\Response(response: 401, description: "Unauthorized")
+        ]
+    )]
     public function logout(): JsonResponse
     {
         try {
@@ -140,15 +151,17 @@ class AuthController extends Controller
 
     /**
      * Get authenticated user
-     * @OA\Get(
-     *      path="/auth/me",
-     *      tags={"Authentication"},
-     *      summary="Get authenticated user",
-     *      security={{"bearerAuth":{}}},
-     *      @OA\Response(response=200, description="User data"),
-     *      @OA\Response(response=401, description="Unauthorized")
-     * )
      */
+    #[OA\Get(
+        path: "/auth/me",
+        tags: ["Authentication"],
+        summary: "Get authenticated user",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(response: 200, description: "User data"),
+            new OA\Response(response: 401, description: "Unauthorized")
+        ]
+    )]
     public function me(): JsonResponse
     {
         return response()->json([
@@ -159,15 +172,17 @@ class AuthController extends Controller
 
     /**
      * Refresh token
-     * @OA\Post(
-     *      path="/auth/refresh",
-     *      tags={"Authentication"},
-     *      summary="Refresh JWT token",
-     *      security={{"bearerAuth":{}}},
-     *      @OA\Response(response=200, description="Token refreshed"),
-     *      @OA\Response(response=401, description="Unauthorized")
-     * )
      */
+    #[OA\Post(
+        path: "/auth/refresh",
+        tags: ["Authentication"],
+        summary: "Refresh JWT token",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(response: 200, description: "Token refreshed"),
+            new OA\Response(response: 401, description: "Unauthorized")
+        ]
+    )]
     public function refresh(): JsonResponse
     {
         try {

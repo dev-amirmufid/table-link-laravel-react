@@ -1,174 +1,32 @@
 {
-    "openapi": "3.0.3",
+    "openapi": "3.0.0",
     "info": {
         "title": "Transaction Dashboard API",
-        "description": "API Documentation for Transaction Dashboard Application\n\n## Authentication\n\nThis API uses JWT (JSON Web Token) for authentication.\n\nTo authenticate, include the JWT token in the Authorization header:\n```\nAuthorization: Bearer <your_token>\n```\n\n### Login Flow\n1. POST /api/auth/login with email and password\n2. Receive access_token in response\n3. Use access_token for all protected endpoints",
-        "version": "1.0.0",
-        "contact": {
-            "email": "support@tablelink.com"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
-        }
+        "description": "API Documentation for Transaction Dashboard",
+        "version": "1.0"
     },
-    "servers": [
-        {
-            "url": "http://localhost:8000/api",
-            "description": "Local API Server"
-        }
-    ],
-    "security": [
-        {
-            "bearerAuth": []
-        }
-    ],
-    "components": {
-        "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-                "description": "JWT Authorization header using the Bearer scheme."
-            }
-        },
-        "schemas": {
-            "User": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "domestic",
-                            "foreign"
-                        ]
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "datetime"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "datetime"
-                    }
-                }
-            },
-            "Transaction": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "buyer_id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "seller_id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "item_id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "quantity": {
-                        "type": "integer"
-                    },
-                    "price": {
-                        "type": "number"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "datetime"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "datetime"
-                    }
-                }
-            },
-            "Error": {
-                "type": "object",
-                "properties": {
-                    "success": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "message": {
-                        "type": "string"
-                    }
-                }
-            },
-            "AuthResponse": {
-                "type": "object",
-                "properties": {
-                    "success": {
-                        "type": "boolean"
-                    },
-                    "message": {
-                        "type": "string"
-                    },
-                    "data": {
-                        "type": "object",
-                        "properties": {
-                            "user": {
-                                "$ref": "#/components/schemas/User"
-                            },
-                            "access_token": {
-                                "type": "string"
-                            },
-                            "token_type": {
-                                "type": "string"
-                            },
-                            "expires_in": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "tags": [
-        {
-            "name": "Authentication",
-            "description": "Authentication Endpoints"
-        },
-        {
-            "name": "Dashboard",
-            "description": "Dashboard Analytics Endpoints"
-        },
-        {
-            "name": "Transactions",
-            "description": "Transaction Endpoints"
-        }
-    ],
     "paths": {
+        "/": {
+            "servers": [
+                {
+                    "url": "http://localhost:8000/api/v1",
+                    "description": "API Server"
+                }
+            ]
+        },
         "/auth/register": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Register a new user",
-                "description": "Register a new user and get JWT token",
+                "description": "Register a new user",
+                "operationId": "08136088c4862c313b35d6518bab8d3a",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object",
                                 "required": [
                                     "name",
                                     "email",
@@ -179,16 +37,10 @@
                                         "type": "string"
                                     },
                                     "email": {
-                                        "type": "string",
-                                        "format": "email"
+                                        "type": "string"
                                     },
                                     "password": {
-                                        "type": "string",
-                                        "format": "password"
-                                    },
-                                    "password_confirmation": {
-                                        "type": "string",
-                                        "format": "password"
+                                        "type": "string"
                                     },
                                     "type": {
                                         "type": "string",
@@ -197,31 +49,18 @@
                                             "foreign"
                                         ]
                                     }
-                                }
+                                },
+                                "type": "object"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "User registered successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
-                                }
-                            }
-                        }
+                        "description": "User registered successfully"
                     },
                     "400": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
+                        "description": "Validation error"
                     }
                 }
             }
@@ -232,51 +71,36 @@
                     "Authentication"
                 ],
                 "summary": "Login user",
-                "description": "Login with email and password to get JWT token",
+                "description": "Login user",
+                "operationId": "99d66635c4992aeaa6aa44ff653d0563",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object",
                                 "required": [
                                     "email",
                                     "password"
                                 ],
                                 "properties": {
                                     "email": {
-                                        "type": "string",
-                                        "format": "email"
+                                        "type": "string"
                                     },
                                     "password": {
-                                        "type": "string",
-                                        "format": "password"
+                                        "type": "string"
                                     }
-                                }
+                                },
+                                "type": "object"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Login successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
-                                }
-                            }
-                        }
+                        "description": "Login successful"
                     },
                     "401": {
-                        "description": "Invalid credentials",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
+                        "description": "Invalid credentials"
                     }
                 }
             }
@@ -287,12 +111,8 @@
                     "Authentication"
                 ],
                 "summary": "Logout user",
-                "description": "Logout and invalidate JWT token",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "description": "Logout user",
+                "operationId": "6abf3b64a4bc7838d56346f05a5153af",
                 "responses": {
                     "200": {
                         "description": "Logout successful"
@@ -300,7 +120,12 @@
                     "401": {
                         "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/auth/me": {
@@ -309,72 +134,75 @@
                     "Authentication"
                 ],
                 "summary": "Get authenticated user",
-                "description": "Get current user information",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "description": "Get authenticated user",
+                "operationId": "7edae2cdbaafc10dff8c9c4198b320a2",
                 "responses": {
                     "200": {
-                        "description": "User data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean"
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        "description": "User data"
                     },
                     "401": {
                         "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/v1/dashboard": {
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh JWT token",
+                "description": "Refresh token",
+                "operationId": "e7ab7446393758bb71fd1946a349e500",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/dashboard": {
             "get": {
                 "tags": [
                     "Dashboard"
                 ],
                 "summary": "Get all dashboard data",
-                "description": "Get complete dashboard with all analytics data",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "description": "Returns all dashboard analytics data",
+                "operationId": "faae45987996934eda46ad27a6f61dea",
                 "parameters": [
                     {
                         "name": "start_date",
                         "in": "query",
-                        "description": "Filter start date (Y-m-d)",
+                        "description": "Start date (Y-m-d H:i:s)",
                         "schema": {
-                            "type": "string",
-                            "format": "date"
+                            "type": "string"
                         }
                     },
                     {
                         "name": "end_date",
                         "in": "query",
-                        "description": "Filter end date (Y-m-d)",
+                        "description": "End date (Y-m-d H:i:s)",
                         "schema": {
-                            "type": "string",
-                            "format": "date"
+                            "type": "string"
                         }
                     },
                     {
                         "name": "period",
                         "in": "query",
-                        "description": "Period for aggregation",
+                        "description": "Period: daily, weekly, monthly",
                         "schema": {
                             "type": "string",
                             "enum": [
@@ -387,79 +215,7 @@
                     {
                         "name": "user_type",
                         "in": "query",
-                        "description": "Filter by user type",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "domestic",
-                                "foreign"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "item_id",
-                        "in": "query",
-                        "description": "Filter by item ID",
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Dashboard data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    }
-                }
-            }
-        },
-        "/v1/dashboard/summary": {
-            "get": {
-                "tags": [
-                    "Dashboard"
-                ],
-                "summary": "Get dashboard summary",
-                "description": "Get summary metrics (total revenue, transactions, quantity, average price)",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "name": "start_date",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "end_date",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "period",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "daily",
-                                "weekly",
-                                "monthly"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "user_type",
-                        "in": "query",
+                        "description": "User type: domestic, foreign",
                         "schema": {
                             "type": "string",
                             "enum": [
@@ -471,46 +227,39 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Summary data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                        "description": "Successful operation"
                     }
                 }
             }
         },
-        "/v1/dashboard/trends": {
+        "/dashboard/summary": {
             "get": {
                 "tags": [
                     "Dashboard"
                 ],
-                "summary": "Get transaction trends",
-                "description": "Get transaction trends over time",
-                "security": [
-                    {
-                        "bearerAuth": []
+                "summary": "Get summary metrics",
+                "description": "Returns summary metrics",
+                "operationId": "892e76df1345997e0682213c6fbbb52d",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
                     }
+                }
+            }
+        },
+        "/dashboard/trends": {
+            "get": {
+                "tags": [
+                    "Dashboard"
                 ],
+                "summary": "Get trends data",
+                "description": "Returns transaction trends",
+                "operationId": "45f3f41f3044dd78ced5561e5dfdc533",
                 "parameters": [
-                    {
-                        "name": "start_date",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "end_date",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
                     {
                         "name": "period",
                         "in": "query",
+                        "description": "Period: daily, weekly, monthly",
                         "schema": {
                             "type": "string",
                             "enum": [
@@ -523,30 +272,132 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Trends data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                        "description": "Successful operation"
                     }
                 }
             }
         },
-        "/v1/dashboard/trending-items": {
+        "/dashboard/trending-items": {
             "get": {
                 "tags": [
                     "Dashboard"
                 ],
                 "summary": "Get trending items",
-                "description": "Get most traded items",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "description": "Returns trending items",
+                "operationId": "5eba929716106511b1959f1b4d117669",
                 "parameters": [
                     {
                         "name": "limit",
                         "in": "query",
+                        "description": "Number of items",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/dashboard/top-buyers": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get top buyers",
+                "description": "Returns top buyers",
+                "operationId": "92ff0c936963af33d7c75066d5f535b1",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of buyers",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/dashboard/top-sellers": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get top sellers",
+                "description": "Returns top sellers",
+                "operationId": "2242ecb2d7521befa4a165c808e412b2",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of sellers",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/dashboard/user-type-distribution": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get user type distribution",
+                "description": "Returns user type distribution",
+                "operationId": "437bc5718d3eada777bfda6f2f5c5646",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/dashboard/user-classification": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get user classification",
+                "description": "Returns user classification",
+                "operationId": "ceacff8952d6ae0608526fb03a1993d4",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/dashboard/top-items": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get top items by revenue",
+                "description": "Returns top items performance by revenue",
+                "operationId": "765cbca218f5430fa61e56f9f62aa645",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items to return",
                         "schema": {
                             "type": "integer",
                             "default": 10
@@ -555,154 +406,112 @@
                     {
                         "name": "start_date",
                         "in": "query",
+                        "description": "Start date (Y-m-d H:i:s)",
                         "schema": {
-                            "type": "string",
-                            "format": "date"
+                            "type": "string"
                         }
                     },
                     {
                         "name": "end_date",
                         "in": "query",
+                        "description": "End date (Y-m-d H:i:s)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user_type",
+                        "in": "query",
+                        "description": "User type: domestic, foreign",
                         "schema": {
                             "type": "string",
-                            "format": "date"
+                            "enum": [
+                                "domestic",
+                                "foreign"
+                            ]
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Trending items data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                        "description": "Successful operation"
                     }
                 }
             }
         },
-        "/v1/dashboard/top-buyers": {
+        "/dashboard/price-distribution": {
             "get": {
                 "tags": [
                     "Dashboard"
                 ],
-                "summary": "Get top buyers",
-                "description": "Get top buyers by transaction count",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "summary": "Get price distribution",
+                "description": "Returns price distribution histogram",
+                "operationId": "770bec0a0ab9e7fa3665c02be4c1129b",
                 "parameters": [
                     {
-                        "name": "limit",
+                        "name": "start_date",
                         "in": "query",
+                        "description": "Start date (Y-m-d H:i:s)",
                         "schema": {
-                            "type": "integer",
-                            "default": 10
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End date (Y-m-d H:i:s)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user_type",
+                        "in": "query",
+                        "description": "User type: domestic, foreign",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "domestic",
+                                "foreign"
+                            ]
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Top buyers data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                        "description": "Successful operation"
                     }
                 }
             }
         },
-        "/v1/dashboard/top-sellers": {
-            "get": {
+        "/dashboard/cache/clear": {
+            "post": {
                 "tags": [
                     "Dashboard"
                 ],
-                "summary": "Get top sellers",
-                "description": "Get top sellers by transaction count",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "default": 10
-                        }
-                    }
-                ],
+                "summary": "Clear dashboard cache",
+                "description": "Clears all cached dashboard data",
+                "operationId": "6c5d8cb513771b47faf0e4b7733a5ae4",
                 "responses": {
                     "200": {
-                        "description": "Top sellers data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                        "description": "Cache cleared successfully"
                     }
                 }
             }
         },
-        "/v1/dashboard/user-type-distribution": {
-            "get": {
-                "tags": [
-                    "Dashboard"
-                ],
-                "summary": "Get user type distribution",
-                "description": "Get distribution of domestic vs foreign users",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User type distribution data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    }
-                }
-            }
-        },
-        "/v1/dashboard/user-classification": {
-            "get": {
-                "tags": [
-                    "Dashboard"
-                ],
-                "summary": "Get user classification",
-                "description": "Get user classification by transaction activity",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User classification data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    }
-                }
-            }
-        },
-        "/v1/transactions": {
+        "/transactions": {
             "get": {
                 "tags": [
                     "Transactions"
                 ],
                 "summary": "Get all transactions",
-                "description": "Get paginated list of transactions",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "description": "Returns paginated transactions",
+                "operationId": "985f8d6a4ee65fbeaf1513cb4f53a3e8",
                 "parameters": [
                     {
                         "name": "page",
                         "in": "query",
+                        "description": "Page number",
                         "schema": {
                             "type": "integer",
                             "default": 1
@@ -711,67 +520,66 @@
                     {
                         "name": "per_page",
                         "in": "query",
+                        "description": "Items per page (max 100)",
                         "schema": {
                             "type": "integer",
                             "default": 15
                         }
                     },
                     {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by buyer name, seller name, or item name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "name": "start_date",
                         "in": "query",
+                        "description": "Start date (Y-m-d H:i:s)",
                         "schema": {
-                            "type": "string",
-                            "format": "date"
+                            "type": "string"
                         }
                     },
                     {
                         "name": "end_date",
                         "in": "query",
+                        "description": "End date (Y-m-d H:i:s)",
                         "schema": {
-                            "type": "string",
-                            "format": "date"
+                            "type": "string"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Transactions list"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                        "description": "Successful operation"
                     }
                 }
             }
         },
-        "/v1/transactions/{id}": {
+        "/transactions/{id}": {
             "get": {
                 "tags": [
                     "Transactions"
                 ],
-                "summary": "Get transaction by ID",
-                "description": "Get a specific transaction",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "summary": "Get single transaction",
+                "description": "Returns a single transaction by ID",
+                "operationId": "0cef9d26f188e69308596914577e6835",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "Transaction UUID",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "format": "uuid"
+                            "type": "string"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Transaction data"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
+                        "description": "Successful operation"
                     },
                     "404": {
                         "description": "Transaction not found"
@@ -779,5 +587,40 @@
                 }
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Dashboard"
+        },
+        {
+            "name": "Transactions",
+            "description": "Transactions"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "JWT Authorization header using the Bearer scheme.",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            },
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ]
 }
