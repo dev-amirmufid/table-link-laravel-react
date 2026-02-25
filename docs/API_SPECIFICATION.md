@@ -8,22 +8,7 @@ http://localhost:8080/api/v1
 
 ## Authentication
 
-### Public Endpoints
-
-The following endpoints do not require authentication:
-
-- `GET /dashboard/analytics`
-- `GET /transactions`
-- `GET /transactions/{id}`
-- `POST /auth/login`
-
-### Protected Endpoints
-
-The following endpoints require JWT authentication:
-
-- `POST /auth/logout`
-- `GET /auth/me`
-- `POST /auth/refresh`
+All endpoints in this API are **public** (no authentication required).
 
 ---
 
@@ -116,24 +101,7 @@ Returns all dashboard analytics data in a single request.
 
 ---
 
-### 2. Clear Dashboard Cache
-
-**Endpoint:** `POST /dashboard/cache/clear`
-
-Clears the cached analytics data.
-
-#### Response (200 OK)
-
-```json
-{
-  "success": true,
-  "message": "Cache cleared successfully"
-}
-```
-
----
-
-### 3. Get Transactions (Paginated)
+### 2. Get Transactions (Paginated)
 
 **Endpoint:** `GET /transactions`
 
@@ -220,7 +188,7 @@ Returns paginated transaction list with optional filtering.
 
 ---
 
-### 4. Get Single Transaction
+### 3. Get Single Transaction
 
 **Endpoint:** `GET /transactions/{id}`
 
@@ -264,110 +232,6 @@ Returns a single transaction by UUID.
 
 ---
 
-### 5. Login
-
-**Endpoint:** `POST /auth/login`
-
-Authenticates user and returns JWT token.
-
-#### Request Body
-
-| Parameter | Type   | Required | Description   |
-| --------- | ------ | -------- | ------------- |
-| email     | string | Yes      | User email    |
-| password  | string | Yes      | User password |
-
-#### Response (200 OK)
-
-```json
-{
-  "success": true,
-  "message": "Login successful",
-  "data": {
-    "user": {
-      "id": "uuid",
-      "name": "Admin User",
-      "email": "admin@example.com",
-      "type": "domestic"
-    },
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-    "token_type": "bearer",
-    "expires_in": 20160
-  }
-}
-```
-
-#### Error Response (401)
-
-```json
-{
-  "success": false,
-  "message": "Invalid credentials"
-}
-```
-
----
-
-### 6. Logout
-
-**Endpoint:** `POST /auth/logout`
-
-Requires JWT authentication. Invalidates the current token.
-
-#### Response (200 OK)
-
-```json
-{
-  "success": true,
-  "message": "Successfully logged out"
-}
-```
-
----
-
-### 7. Get Current User
-
-**Endpoint:** `GET /auth/me`
-
-Requires JWT authentication. Returns authenticated user info.
-
-#### Response (200 OK)
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "name": "Admin User",
-    "email": "admin@example.com",
-    "type": "domestic"
-  }
-}
-```
-
----
-
-### 8. Refresh Token
-
-**Endpoint:** `POST /auth/refresh`
-
-Requires JWT authentication. Returns new JWT token.
-
-#### Response (200 OK)
-
-```json
-{
-  "success": true,
-  "data": {
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-    "token_type": "bearer",
-    "expires_in": 20160
-  }
-}
-```
-
----
-
 ## HTTP Status Codes
 
 | Code | Description           |
@@ -375,7 +239,6 @@ Requires JWT authentication. Returns new JWT token.
 | 200  | Success               |
 | 201  | Created               |
 | 400  | Bad Request           |
-| 401  | Unauthorized          |
 | 404  | Not Found             |
 | 422  | Validation Error      |
 | 500  | Internal Server Error |
