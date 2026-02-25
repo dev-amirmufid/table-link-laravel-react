@@ -1,6 +1,5 @@
 import axios from 'axios'
 import type {
-  DashboardData,
   DashboardFilters,
   PaginatedResponse,
   Transaction,
@@ -16,77 +15,49 @@ const api = axios.create({
   },
 })
 
-// Dashboard API (public - no auth required)
-export const dashboardApi = {
-  getAll: (filters?: DashboardFilters) =>
-    api.get<{ success: boolean; data: DashboardData }>('/v1/dashboard', { params: filters }),
-
-  getSummary: (filters?: DashboardFilters) =>
-    api.get<{ success: boolean; data: any }>('/v1/dashboard/summary', { params: filters }),
-
-  getTrends: (filters?: DashboardFilters) =>
-    api.get<{ 
-      success: boolean; 
-      data: any[]; 
-      statistics: {
-        total_transactions: number;
-        total_revenue: number;
-        avg_transactions: number;
-        avg_revenue: number;
-        period_count: number;
+// Dashboard Analytics API - GOD QUERY
+export const analyticsApi = {
+  getAnalytics: (
+    filters?: DashboardFilters,
+    options?: {
+      include?: string
+      period?: string
+      limit?: number
+    }
+  ) =>
+    api.get<{
+      success: boolean
+      data: {
+        summary?: any
+        trends?: any[]
+        trending_items?: any[]
+        user_classification?: any[]
+        top_buyers?: any[]
+        top_sellers?: any[]
+        revenue_contribution?: any[]
       }
-    }>('/v1/dashboard/trends', { params: filters }),
-
-  getTrendingItems: (filters?: DashboardFilters, limit = 10) =>
-    api.get<{ success: boolean; data: any[] }>('/v1/dashboard/trending-items', {
-      params: { ...filters, limit },
+      period: string
+      limit: number
+      include: string[]
+      cached: boolean
+    }>('/v1/dashboard/analytics', {
+      params: {
+        ...filters,
+        include: options?.include || 'summary,trends,trending_items,user_classification,top_buyers,top_sellers,revenue_contribution',
+        period: options?.period || 'daily',
+        limit: options?.limit || 10,
+      },
     }),
-
-  getTopBuyers: (filters?: DashboardFilters, limit = 10) =>
-    api.get<{ success: boolean; data: any[] }>('/v1/dashboard/top-buyers', {
-      params: { ...filters, limit },
-    }),
-
-  getTopSellers: (filters?: DashboardFilters, limit = 10) =>
-    api.get<{ success: boolean; data: any[] }>('/v1/dashboard/top-sellers', {
-      params: { ...filters, limit },
-    }),
-
-  getUserTypeDistribution: (filters?: DashboardFilters) =>
-    api.get<{ success: boolean; data: any[] }>('/v1/dashboard/user-type-distribution', {
-      params: filters,
-    }),
-
-  getUserClassification: () =>
-    api.get<{ success: boolean; data: any[] }>('/v1/dashboard/user-classification'),
 
   clearCache: () =>
     api.post<{ success: boolean; message: string }>('/v1/dashboard/cache/clear'),
-
-  getTopItems: (filters?: DashboardFilters, limit = 10) =>
-    api.get<{ 
-      success: boolean; 
-      data: any[];
-      statistics: { total_revenue: number; total_transactions: number }
-    }>('/v1/dashboard/top-items', {
-      params: { ...filters, limit },
-    }),
-
-  getPriceDistribution: (filters?: DashboardFilters) =>
-    api.get<{ 
-      success: boolean; 
-      data: any[];
-      statistics: { total_transactions: number; total_revenue: number }
-    }>('/v1/dashboard/price-distribution', {
-      params: filters,
-    }),
 }
 
-// Transaction API (public - no auth required)
+// Transaction API
 export const transactionApi = {
-  getAll: (filters?: DashboardFilters, perPage = 15, page = 1) =>
+  getAll: (filters?: DashboardFilters, perPage = 15, page = 1, search = '') =>
     api.get<{ success: boolean; data: PaginatedResponse<Transaction> }>('/v1/transactions', {
-      params: { ...filters, per_page: perPage, page },
+      params: { ...filters, per_page: perPage, page, search },
     }),
 
   getById: (id: string) =>

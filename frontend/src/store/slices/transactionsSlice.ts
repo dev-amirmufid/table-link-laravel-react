@@ -50,10 +50,7 @@ export const fetchTransactions = createAsyncThunk(
     sortOrder?: 'asc' | 'desc'
   }, { rejectWithValue }) => {
     try {
-      // Build search params - in a real app, you'd have a search endpoint
-      // For now, we'll filter after fetching or pass it to backend if supported
-      const searchFilters = search ? { ...filters, search } : filters
-      const response = await transactionApi.getAll(searchFilters, perPage, page)
+      const response = await transactionApi.getAll(filters, perPage, page, search)
       return {
         ...response.data.data,
         search,

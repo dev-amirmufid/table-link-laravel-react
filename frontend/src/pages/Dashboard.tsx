@@ -1,26 +1,20 @@
 import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { 
-  fetchSummary, 
-  fetchTrends, 
-  fetchTopBuyers, 
-  fetchTopSellers, 
-  fetchUserTypeDistribution,
-  fetchUserClassification,
-  fetchTopItems,
-  fetchPriceDistribution,
-  setFilters 
+import {
+  fetchDashboardAnalytics,
+  setFilters
 } from '@/store/slices/dashboardSlice'
 import { useTheme } from '@/contexts/ThemeContext'
 import { exportToCSV } from '@/lib/csv'
 import type { DashboardFilters } from '@/types'
 import { FilterBar } from '@/components/FilterBar'
 import { SummaryCards } from '@/components/SummaryCards'
-import { LineChartComponent } from '@/components/charts/LineChartComponent'
-import { BarChartComponent } from '@/components/charts/BarChartComponent'
-import { PieChartComponent } from '@/components/charts/PieChartComponent'
-import { ItemPerformanceChart } from '@/components/charts/BarHorizontalChartComponent'
-import { PriceDistributionChart } from '@/components/charts/PriceDistributionChart'
+import { TrendsChart } from '@/components/charts/TrendsChart'
+import { TrendingItemsChart } from '@/components/charts/TrendingItemsChart'
+import { UserClassificationChart } from '@/components/charts/UserClassificationChart'
+import { RevenueContributionChart } from '@/components/charts/RevenueContributionChart'
+import { TopBuyerList } from '@/components/lists/TopBuyerList'
+import { TopSellerList } from '@/components/lists/TopSellerList'
 import { TransactionsTable } from '@/components/TransactionsTable'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -34,26 +28,17 @@ export function Dashboard() {
   const { 
     summary, 
     trends, 
-    topBuyers, 
-    topSellers, 
-    userTypeDistribution, 
+    trendingItems, 
     userClassification,
-    topItems,
-    priceDistribution,
+    relations,
+    revenueContribution,
     filters, 
     loading 
   } = useAppSelector((state) => state.dashboard)
 
-  // Fetch data on mount and when filters change
+  // Fetch data on mount and when filters change - GOD QUERY (single endpoint)
   useEffect(() => {
-    dispatch(fetchSummary(filters))
-    dispatch(fetchTrends(filters))
-    dispatch(fetchTopBuyers({ filters, limit: 10 }))
-    dispatch(fetchTopSellers({ filters, limit: 10 }))
-    dispatch(fetchUserTypeDistribution(filters))
-    dispatch(fetchUserClassification())
-    dispatch(fetchTopItems({ filters, limit: 10 }))
-    dispatch(fetchPriceDistribution(filters))
+    dispatch(fetchDashboardAnalytics({ filters, period: filters.period || 'daily', limit: 10 }))
   }, [dispatch, filters])
 
   const handleFilterChange = (newFilters: DashboardFilters) => {
@@ -64,25 +49,18 @@ export function Dashboard() {
     if (!trends.length) return
     
     exportToCSV(trends.map(t => ({
-      date: t.date,
-      count: t.count,
+      period: t.period,
+      transactions: t.transactions,
       revenue: t.revenue,
     })), 'transaction-trends', [
-      { key: 'date', header: 'Date' },
-      { key: 'count', header: 'Transaction Count' },
+      { key: 'period', header: 'Period' },
+      { key: 'transactions', header: 'Transactions' },
       { key: 'revenue', header: 'Revenue' },
     ])
   }
 
   const handleRefresh = () => {
-    dispatch(fetchSummary(filters))
-    dispatch(fetchTrends(filters))
-    dispatch(fetchTopBuyers({ filters, limit: 10 }))
-    dispatch(fetchTopSellers({ filters, limit: 10 }))
-    dispatch(fetchUserTypeDistribution(filters))
-    dispatch(fetchUserClassification())
-    dispatch(fetchTopItems({ filters, limit: 10 }))
-    dispatch(fetchPriceDistribution(filters))
+    dispatch(fetchDashboardAnalytics({ filters, period: filters.period || 'daily', limit: 10 }))
   }
 
   const isAnyLoading = Object.values(loading).some(v => v)
@@ -125,7 +103,7 @@ export function Dashboard() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Transaction Trends */}
+        {/* Transaction Trends - Line Chart */}
         <Card>
           <CardHeader>
             <CardTitle>Transaction Trends</CardTitle>
@@ -136,7 +114,55 @@ export function Dashboard() {
                 <Skeleton className="h-full w-full" />
               </div>
             ) : (
-              <LineChartComponent data={trends} />
+              <TrendsChart data={trends} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Trending Items - Bar Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Trending Items</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading.trendingItems ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : (
+              <TrendingItemsChart data={trendingItems} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* User Classification - Pie/Donut Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Domestic vs Foreign Users</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading.userClassification ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : (
+              <UserClassificationChart data={userClassification} />
+            )}
+          </CardContent>
+        </Card>
+        
+        {/* Revenue Contribution - Bar Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Revenue Contribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading.revenueContribution ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : (
+              <RevenueContributionChart data={revenueContribution} />
             )}
           </CardContent>
         </Card>
@@ -147,12 +173,12 @@ export function Dashboard() {
             <CardTitle>Top Buyers</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading.topBuyers ? (
+            {loading.relations ? (
               <div className="h-[300px] flex items-center justify-center">
                 <Skeleton className="h-full w-full" />
               </div>
             ) : (
-              <BarChartComponent data={topBuyers} />
+              <TopBuyerList data={relations.top_buyers || []} />
             )}
           </CardContent>
         </Card>
@@ -163,90 +189,12 @@ export function Dashboard() {
             <CardTitle>Top Sellers</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading.topSellers ? (
+            {loading.relations ? (
               <div className="h-[300px] flex items-center justify-center">
                 <Skeleton className="h-full w-full" />
               </div>
             ) : (
-              <BarChartComponent data={topSellers} />
-            )}
-          </CardContent>
-        </Card>
-
-        {/* User Type Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>User Type Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading.userTypeDistribution ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <Skeleton className="h-full w-full" />
-              </div>
-            ) : (
-              <PieChartComponent data={userTypeDistribution} />
-            )}
-          </CardContent>
-        </Card>
-
-        {/* User Classification */}
-        <Card>
-          <CardHeader>
-            <CardTitle>User Classification</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading.userClassification ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <Skeleton className="h-full w-full" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {userClassification.map((item) => (
-                  <div key={item.type} className="flex justify-between items-center p-4 border rounded-lg">
-                    <div className="font-medium capitalize">{item.type}</div>
-                    <div className="text-2xl font-bold">{item.count}</div>
-                  </div>
-                ))}
-                {userClassification.length === 0 && (
-                  <p className="text-muted-foreground text-center">No data available</p>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Item Performance - Top Items by Revenue */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Items by Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading.topItems ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <Skeleton className="h-full w-full" />
-              </div>
-            ) : (
-              <ItemPerformanceChart 
-                data={topItems} 
-              />
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Price Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Price Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading.priceDistribution ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <Skeleton className="h-full w-full" />
-              </div>
-            ) : (
-              <PriceDistributionChart 
-                data={priceDistribution}
-              />
+              <TopSellerList data={relations.top_sellers || []} />
             )}
           </CardContent>
         </Card>

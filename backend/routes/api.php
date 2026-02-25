@@ -1,24 +1,17 @@
 <?php
 
+use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes - Dashboard (no auth required)
 Route::prefix('v1')->group(function () {
-    // Dashboard endpoints
-    Route::get('/dashboard', [DashboardController::class, 'index']);
-    Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
-    Route::get('/dashboard/trends', [DashboardController::class, 'trends']);
-    Route::get('/dashboard/trending-items', [DashboardController::class, 'trendingItems']);
-    Route::get('/dashboard/top-buyers', [DashboardController::class, 'topBuyers']);
-    Route::get('/dashboard/top-sellers', [DashboardController::class, 'topSellers']);
-    Route::get('/dashboard/user-type-distribution', [DashboardController::class, 'userTypeDistribution']);
-    Route::get('/dashboard/user-classification', [DashboardController::class, 'userClassification']);
-    Route::get('/dashboard/top-items', [DashboardController::class, 'topItems']);
-    Route::get('/dashboard/price-distribution', [DashboardController::class, 'priceDistribution']);
-    Route::post('/dashboard/cache/clear', [DashboardController::class, 'clearCache']);
+    // GOD QUERY - Single endpoint for all dashboard data
+    Route::get('/dashboard/analytics', [AnalyticsController::class, 'analytics']);
+    
+    // Clear cache
+    Route::post('/dashboard/cache/clear', [AnalyticsController::class, 'clearCache']);
 
     // Transaction endpoints
     Route::get('/transactions', [TransactionController::class, 'index']);

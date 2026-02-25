@@ -56,7 +56,7 @@ export function SummaryCards({ data, isLoading }: SummaryCardsProps) {
     },
     {
       title: 'Average Price',
-      value: formatCurrency(data.average_price),
+      value: formatCurrency(data.avg_transaction_price),
       icon: TrendingUp,
       description: 'Average price per item',
     },

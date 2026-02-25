@@ -28,15 +28,17 @@ export interface Transaction {
 }
 
 export interface Summary {
-  total_revenue: number
   total_transactions: number
   total_quantity: number
-  average_price: number
+  total_revenue: number
+  active_buyers: number
+  active_sellers: number
+  avg_transaction_price: number
 }
 
 export interface Trend {
-  date: string
-  count: number
+  period: string
+  transactions: number
   revenue: number
 }
 
@@ -58,9 +60,11 @@ export interface TopUser {
 }
 
 export interface UserTypeDistribution {
-  type: string
-  count: number
-  revenue: number
+  type?: string
+  name?: string
+  count?: number
+  value?: number
+  revenue?: number
 }
 
 export interface DashboardFilters {
