@@ -161,7 +161,7 @@ TableLink is a Laravel 12 + React Analytics Dashboard application for transactio
 | Component          | Technology                           |
 | ------------------ | ------------------------------------ |
 | Backend Framework  | Laravel 12                           |
-| Frontend Framework | React 18 + TypeScript                |
+| Frontend Framework | React 19 + TypeScript                |
 | Database           | MySQL 8.0                            |
 | Cache              | Database (MySQL)                     |
 | API Documentation  | L5-Swagger (OpenAPI 3.0)             |

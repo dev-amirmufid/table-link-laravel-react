@@ -16,7 +16,7 @@ Laravel 12 + React Analytics Dashboard for transaction analytics.
 | Component | Technology            |
 | --------- | --------------------- |
 | Backend   | Laravel 12            |
-| Frontend  | React 18 + TypeScript |
+| Frontend  | React 19 + TypeScript |
 | Database  | MySQL 8.0             |
 | Cache     | Database              |
 | API Docs  | L5-Swagger            |
@@ -129,7 +129,7 @@ POST /api/v1/auth/refresh
 │   │   ├── migrations/
 │   │   └── seeders/
 │   └── routes/
-├── frontend/               # React 18 Frontend
+├── frontend/               # React 19 Frontend
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/

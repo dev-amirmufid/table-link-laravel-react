@@ -8,7 +8,7 @@ The React frontend provides an interactive dashboard for visualizing transaction
 
 | Component        | Technology           |
 | ---------------- | -------------------- |
-| Framework        | React 18             |
+| Framework        | React 19             |
 | Language         | TypeScript           |
 | State Management | Redux Toolkit        |
 | HTTP Client      | Axios                |
