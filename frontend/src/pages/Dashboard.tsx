@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { dashboardApi } from '@/lib/api'
-import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { exportToCSV } from '@/lib/csv'
 import type { DashboardData, DashboardFilters } from '@/types'
@@ -14,7 +12,7 @@ import { DataTable } from '@/components/DataTable'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { LogOut, User, Moon, Sun, Download } from 'lucide-react'
+import { Moon, Sun, Download } from 'lucide-react'
 
 export function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
@@ -22,14 +20,7 @@ export function Dashboard() {
   const [filters, setFilters] = useState<DashboardFilters>({
     period: 'daily',
   })
-  const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const navigate = useNavigate()
-
-  const handleLogout = async () => {
-    await logout()
-    navigate('/login')
-  }
 
   useEffect(() => {
     fetchDashboardData()
@@ -71,7 +62,6 @@ export function Dashboard() {
       <div className="flex items-center justify-between">
         <Skeleton className="h-8 w-64" />
         <div className="flex gap-2">
-          <Skeleton className="h-10 w-10" />
           <Skeleton className="h-10 w-10" />
           <Skeleton className="h-10 w-24" />
         </div>
@@ -120,14 +110,6 @@ export function Dashboard() {
           <Button variant="outline" size="sm" onClick={handleExportCSV}>
             <Download className="h-4 w-4 mr-2" />
             Export CSV
-          </Button>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground ml-2">
-            <User className="h-4 w-4" />
-            <span>{user?.name}</span>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Keluar
           </Button>
         </div>
       </div>
