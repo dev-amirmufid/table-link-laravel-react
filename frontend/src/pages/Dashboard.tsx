@@ -6,6 +6,8 @@ import {
   fetchTopBuyers, 
   fetchTopSellers, 
   fetchUserTypeDistribution,
+  fetchTopItems,
+  fetchPriceDistribution,
   setFilters 
 } from '@/store/slices/dashboardSlice'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -16,6 +18,8 @@ import { SummaryCards } from '@/components/SummaryCards'
 import { LineChartComponent } from '@/components/charts/LineChartComponent'
 import { BarChartComponent } from '@/components/charts/BarChartComponent'
 import { PieChartComponent } from '@/components/charts/PieChartComponent'
+import { ItemPerformanceChart } from '@/components/charts/BarHorizontalChartComponent'
+import { PriceDistributionChart } from '@/components/charts/PriceDistributionChart'
 import { TransactionsTable } from '@/components/TransactionsTable'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -26,8 +30,19 @@ export function Dashboard() {
   const dispatch = useAppDispatch()
   const { theme, toggleTheme } = useTheme()
   
-  const { summary, trends, topBuyers, topSellers, userTypeDistribution, filters, loading } = 
-    useAppSelector((state) => state.dashboard)
+  const { 
+    summary, 
+    trends, 
+    topBuyers, 
+    topSellers, 
+    userTypeDistribution, 
+    topItems,
+    topItemsStatistics,
+    priceDistribution,
+    priceDistributionStatistics,
+    filters, 
+    loading 
+  } = useAppSelector((state) => state.dashboard)
 
   // Fetch data on mount and when filters change
   useEffect(() => {
@@ -36,6 +51,8 @@ export function Dashboard() {
     dispatch(fetchTopBuyers({ filters, limit: 10 }))
     dispatch(fetchTopSellers({ filters, limit: 10 }))
     dispatch(fetchUserTypeDistribution(filters))
+    dispatch(fetchTopItems({ filters, limit: 10 }))
+    dispatch(fetchPriceDistribution(filters))
   }, [dispatch, filters])
 
   const handleFilterChange = (newFilters: DashboardFilters) => {
@@ -62,6 +79,8 @@ export function Dashboard() {
     dispatch(fetchTopBuyers({ filters, limit: 10 }))
     dispatch(fetchTopSellers({ filters, limit: 10 }))
     dispatch(fetchUserTypeDistribution(filters))
+    dispatch(fetchTopItems({ filters, limit: 10 }))
+    dispatch(fetchPriceDistribution(filters))
   }
 
   const isAnyLoading = Object.values(loading).some(v => v)
@@ -164,6 +183,44 @@ export function Dashboard() {
               </div>
             ) : (
               <PieChartComponent data={userTypeDistribution} />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Item Performance - Top Items by Revenue */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Items by Revenue</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading.topItems ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : (
+              <ItemPerformanceChart 
+                data={topItems} 
+                statistics={topItemsStatistics}
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Price Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Price Distribution</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading.priceDistribution ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Skeleton className="h-full w-full" />
+              </div>
+            ) : (
+              <PriceDistributionChart 
+                data={priceDistribution}
+                statistics={priceDistributionStatistics}
+              />
             )}
           </CardContent>
         </Card>

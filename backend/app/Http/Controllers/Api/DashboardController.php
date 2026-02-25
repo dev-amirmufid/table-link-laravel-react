@@ -147,9 +147,23 @@ class DashboardController extends Controller
             return $this->analyticsService->getTrends($filters, $period);
         });
 
+        // Calculate statistics from the data
+        $totalTransactions = array_sum(array_column($data, 'count'));
+        $totalRevenue = array_sum(array_column($data, 'revenue'));
+        $count = count($data);
+        $avgTransactions = $count > 0 ? round($totalTransactions / $count) : 0;
+        $avgRevenue = $count > 0 ? round($totalRevenue / $count) : 0;
+
         return response()->json([
             'success' => true,
             'data' => $data,
+            'statistics' => [
+                'total_transactions' => $totalTransactions,
+                'total_revenue' => $totalRevenue,
+                'avg_transactions' => $avgTransactions,
+                'avg_revenue' => $avgRevenue,
+                'period_count' => $count,
+            ],
             'period' => $period,
             'cached' => Cache::has($cacheKey),
         ]);
@@ -283,6 +297,63 @@ class DashboardController extends Controller
     }
 
     /**
+     * Get top items by revenue
+     */
+    public function topItems(Request $request): JsonResponse
+    {
+        $filters = $this->filterService->getFilters($request);
+        $limit = $request->input('limit', 10);
+        
+        $cacheKey = $this->generateCacheKey('dashboard.item_performance', $filters, ['limit' => $limit]);
+
+        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($limit, $filters) {
+            return $this->analyticsService->getTopItemsByRevenue($limit, $filters);
+        });
+
+        // Calculate statistics
+        $totalRevenue = array_sum(array_column($data, 'total_revenue'));
+        $totalTransactions = array_sum(array_column($data, 'transaction_count'));
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'statistics' => [
+                'total_revenue' => $totalRevenue,
+                'total_transactions' => $totalTransactions,
+            ],
+            'cached' => Cache::has($cacheKey),
+        ]);
+    }
+
+    /**
+     * Get price distribution
+     */
+    public function priceDistribution(Request $request): JsonResponse
+    {
+        $filters = $this->filterService->getFilters($request);
+        
+        $cacheKey = $this->generateCacheKey('dashboard.price_distribution', $filters);
+
+        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($filters) {
+            return $this->analyticsService->getPriceDistribution($filters);
+        });
+
+        // Calculate statistics
+        $totalTransactions = array_sum(array_column($data, 'count'));
+        $totalRevenue = array_sum(array_column($data, 'revenue'));
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'statistics' => [
+                'total_transactions' => $totalTransactions,
+                'total_revenue' => $totalRevenue,
+            ],
+            'cached' => Cache::has($cacheKey),
+        ]);
+    }
+
+    /**
      * Clear all dashboard cache
      * @OA\Post(
      *      path="/dashboard/cache/clear",
@@ -300,6 +371,8 @@ class DashboardController extends Controller
         Cache::forget('dashboard.top_sellers');
         Cache::forget('dashboard.user_type_dist');
         Cache::forget('dashboard.user_classification');
+        Cache::forget('dashboard.item_performance');
+        Cache::forget('dashboard.price_distribution');
 
         return response()->json([
             'success' => true,

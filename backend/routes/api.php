@@ -16,6 +16,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/dashboard/top-sellers', [DashboardController::class, 'topSellers']);
     Route::get('/dashboard/user-type-distribution', [DashboardController::class, 'userTypeDistribution']);
     Route::get('/dashboard/user-classification', [DashboardController::class, 'userClassification']);
+    Route::get('/dashboard/top-items', [DashboardController::class, 'topItems']);
+    Route::get('/dashboard/price-distribution', [DashboardController::class, 'priceDistribution']);
     Route::post('/dashboard/cache/clear', [DashboardController::class, 'clearCache']);
 
     // Transaction endpoints

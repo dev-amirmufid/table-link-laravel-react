@@ -3,12 +3,40 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import { dashboardApi } from '@/lib/api'
 import type { DashboardFilters, Summary, Trend, TopUser, UserTypeDistribution } from '@/types'
 
+interface TrendStatistics {
+  total_transactions: number
+  total_revenue: number
+  avg_transactions: number
+  avg_revenue: number
+  period_count: number
+}
+
+interface TopItem {
+  id: string
+  item_code: string
+  item_name: string
+  transaction_count: number
+  total_quantity: number
+  total_revenue: number
+}
+
+interface PriceDistribution {
+  range: string
+  count: number
+  revenue: number
+}
+
 interface DashboardState {
   summary: Summary | null
   trends: Trend[]
+  trendStatistics: TrendStatistics | null
   topBuyers: TopUser[]
   topSellers: TopUser[]
   userTypeDistribution: UserTypeDistribution[]
+  topItems: TopItem[]
+  topItemsStatistics: { total_revenue: number; total_transactions: number } | null
+  priceDistribution: PriceDistribution[]
+  priceDistributionStatistics: { total_transactions: number; total_revenue: number } | null
   filters: DashboardFilters
   loading: {
     summary: boolean
@@ -16,6 +44,8 @@ interface DashboardState {
     topBuyers: boolean
     topSellers: boolean
     userTypeDistribution: boolean
+    topItems: boolean
+    priceDistribution: boolean
   }
   error: string | null
 }
@@ -23,9 +53,14 @@ interface DashboardState {
 const initialState: DashboardState = {
   summary: null,
   trends: [],
+  trendStatistics: null,
   topBuyers: [],
   topSellers: [],
   userTypeDistribution: [],
+  topItems: [],
+  topItemsStatistics: null,
+  priceDistribution: [],
+  priceDistributionStatistics: null,
   filters: { period: 'daily' },
   loading: {
     summary: true,
@@ -33,6 +68,8 @@ const initialState: DashboardState = {
     topBuyers: true,
     topSellers: true,
     userTypeDistribution: true,
+    topItems: true,
+    priceDistribution: true,
   },
   error: null,
 }
@@ -55,7 +92,10 @@ export const fetchTrends = createAsyncThunk(
   async (filters: DashboardFilters, { rejectWithValue }) => {
     try {
       const response = await dashboardApi.getTrends(filters)
-      return response.data.data
+      return {
+        data: response.data.data,
+        statistics: response.data.statistics,
+      }
     } catch {
       return rejectWithValue('Failed to fetch trends')
     }
@@ -98,6 +138,36 @@ export const fetchUserTypeDistribution = createAsyncThunk(
   }
 )
 
+export const fetchTopItems = createAsyncThunk(
+  'dashboard/fetchTopItems',
+  async ({ filters, limit = 10 }: { filters: DashboardFilters; limit?: number }, { rejectWithValue }) => {
+    try {
+      const response = await dashboardApi.getTopItems(filters, limit)
+      return {
+        data: response.data.data,
+        statistics: response.data.statistics,
+      }
+    } catch {
+      return rejectWithValue('Failed to fetch top items')
+    }
+  }
+)
+
+export const fetchPriceDistribution = createAsyncThunk(
+  'dashboard/fetchPriceDistribution',
+  async (filters: DashboardFilters, { rejectWithValue }) => {
+    try {
+      const response = await dashboardApi.getPriceDistribution(filters)
+      return {
+        data: response.data.data,
+        statistics: response.data.statistics,
+      }
+    } catch {
+      return rejectWithValue('Failed to fetch price distribution')
+    }
+  }
+)
+
 const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
@@ -129,7 +199,8 @@ const dashboardSlice = createSlice({
     })
     builder.addCase(fetchTrends.fulfilled, (state, action) => {
       state.loading.trends = false
-      state.trends = action.payload
+      state.trends = action.payload.data
+      state.trendStatistics = action.payload.statistics
     })
     builder.addCase(fetchTrends.rejected, (state, action) => {
       state.loading.trends = false
@@ -172,6 +243,34 @@ const dashboardSlice = createSlice({
     })
     builder.addCase(fetchUserTypeDistribution.rejected, (state, action) => {
       state.loading.userTypeDistribution = false
+      state.error = action.payload as string
+    })
+
+    // Top Items
+    builder.addCase(fetchTopItems.pending, (state) => {
+      state.loading.topItems = true
+    })
+    builder.addCase(fetchTopItems.fulfilled, (state, action) => {
+      state.loading.topItems = false
+      state.topItems = action.payload.data
+      state.topItemsStatistics = action.payload.statistics
+    })
+    builder.addCase(fetchTopItems.rejected, (state, action) => {
+      state.loading.topItems = false
+      state.error = action.payload as string
+    })
+
+    // Price Distribution
+    builder.addCase(fetchPriceDistribution.pending, (state) => {
+      state.loading.priceDistribution = true
+    })
+    builder.addCase(fetchPriceDistribution.fulfilled, (state, action) => {
+      state.loading.priceDistribution = false
+      state.priceDistribution = action.payload.data
+      state.priceDistributionStatistics = action.payload.statistics
+    })
+    builder.addCase(fetchPriceDistribution.rejected, (state, action) => {
+      state.loading.priceDistribution = false
       state.error = action.payload as string
     })
   },

@@ -72,7 +72,7 @@ export function SummaryCards({ data, isLoading }: SummaryCardsProps) {
                 <p className="text-sm font-medium text-muted-foreground">
                   {card.title}
                 </p>
-                <p className="text-2xl font-bold">{card.value}</p>
+                <p className="text-xl font-bold">{card.value}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {card.description}
                 </p>

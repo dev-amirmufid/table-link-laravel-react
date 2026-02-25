@@ -25,7 +25,17 @@ export const dashboardApi = {
     api.get<{ success: boolean; data: any }>('/v1/dashboard/summary', { params: filters }),
 
   getTrends: (filters?: DashboardFilters) =>
-    api.get<{ success: boolean; data: any[] }>('/v1/dashboard/trends', { params: filters }),
+    api.get<{ 
+      success: boolean; 
+      data: any[]; 
+      statistics: {
+        total_transactions: number;
+        total_revenue: number;
+        avg_transactions: number;
+        avg_revenue: number;
+        period_count: number;
+      }
+    }>('/v1/dashboard/trends', { params: filters }),
 
   getTrendingItems: (filters?: DashboardFilters, limit = 10) =>
     api.get<{ success: boolean; data: any[] }>('/v1/dashboard/trending-items', {
@@ -49,6 +59,24 @@ export const dashboardApi = {
 
   getUserClassification: () =>
     api.get<{ success: boolean; data: any[] }>('/v1/dashboard/user-classification'),
+
+  getTopItems: (filters?: DashboardFilters, limit = 10) =>
+    api.get<{ 
+      success: boolean; 
+      data: any[];
+      statistics: { total_revenue: number; total_transactions: number }
+    }>('/v1/dashboard/top-items', {
+      params: { ...filters, limit },
+    }),
+
+  getPriceDistribution: (filters?: DashboardFilters) =>
+    api.get<{ 
+      success: boolean; 
+      data: any[];
+      statistics: { total_transactions: number; total_revenue: number }
+    }>('/v1/dashboard/price-distribution', {
+      params: filters,
+    }),
 }
 
 // Transaction API (public - no auth required)

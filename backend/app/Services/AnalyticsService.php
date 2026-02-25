@@ -113,6 +113,30 @@ class AnalyticsService
     }
 
     /**
+     * Get top items by revenue
+     */
+    public function getTopItemsByRevenue(int $limit = 10, array $filters = []): array
+    {
+        $cacheKey = 'analytics_top_items_' . md5(serialize($filters)) . $limit;
+
+        return Cache::remember($cacheKey, 300, function () use ($limit, $filters) {
+            return $this->transactionRepository->getTopItemsByRevenue($limit, $filters);
+        });
+    }
+
+    /**
+     * Get price distribution (histogram)
+     */
+    public function getPriceDistribution(array $filters = []): array
+    {
+        $cacheKey = 'analytics_price_distribution_' . md5(serialize($filters));
+
+        return Cache::remember($cacheKey, 300, function () use ($filters) {
+            return $this->transactionRepository->getPriceDistribution($filters);
+        });
+    }
+
+    /**
      * Get all analytics data for dashboard
      */
     public function getDashboardData(array $filters = [], string $period = 'daily'): array
