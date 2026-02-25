@@ -302,7 +302,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },
@@ -356,7 +356,7 @@ export default defineConfig({
 
 ```env
 # API URL
-VITE_API_URL=http://localhost:8000/api/v1
+VITE_API_URL=http://localhost:8080/api/v1
 ```
 
 ## 🧪 Testing Files

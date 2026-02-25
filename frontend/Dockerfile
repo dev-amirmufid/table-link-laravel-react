@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -17,12 +17,10 @@ RUN npm run build
 # Production stage - serve with Nginx
 FROM nginx:alpine
 
-# Copy built files
-COPY --from=builder /app/dist /var/www/frontend
+# Copy built files to nginx root
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
-
+# Use default nginx config
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

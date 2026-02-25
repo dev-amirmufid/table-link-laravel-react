@@ -179,7 +179,7 @@ APP_NAME=TransactionDashboard
 APP_ENV=local
 APP_KEY=base64:xxxxx
 APP_DEBUG=true
-APP_URL=http://localhost:8000
+APP_URL=http://localhost:8080
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1

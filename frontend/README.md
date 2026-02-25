@@ -74,7 +74,7 @@ npm install axios @tanstack/react-query recharts lucide-react \
 3. **Setup Environment Variables**
 Buat file `.env`:
 ```env
-VITE_API_URL=http://localhost:8000/api/v1
+VITE_API_URL=http://localhost:8080/api/v1
 ```
 
 4. **Jalankan Development Server**
@@ -284,7 +284,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },

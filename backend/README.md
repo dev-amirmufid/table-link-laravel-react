@@ -91,7 +91,7 @@ php artisan db:seed
 php artisan serve
 ```
 
-API akan tersedia di `http://localhost:8000`
+API akan tersedia di `http://localhost:8080`
 
 ## 🐳 Cara Install (Docker)
 
@@ -123,7 +123,7 @@ exit
 ```
 
 3. **Akses API**
-- Backend API: http://localhost:8000
+- Backend API: http://localhost:8080
 - MySQL: localhost:3306
 
 ## 📡 API Endpoints
@@ -166,10 +166,10 @@ Semua endpoint dashboard mendukung parameter filter:
 
 ```bash
 # Get dashboard data with date range
-curl "http://localhost:8000/api/v1/dashboard?start_date=2024-01-01&end_date=2024-12-31&period=monthly"
+curl "http://localhost:8080/api/v1/dashboard?start_date=2024-01-01&end_date=2024-12-31&period=monthly"
 
 # Get trends
-curl "http://localhost:8000/api/v1/dashboard/trends?period=weekly"
+curl "http://localhost:8080/api/v1/dashboard/trends?period=weekly"
 ```
 
 ## 🏗️ Architecture
