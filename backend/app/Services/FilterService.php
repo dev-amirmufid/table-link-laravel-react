@@ -44,6 +44,11 @@ class FilterService
             $filters['seller_id'] = $request->input('seller_id');
         }
 
+        // Search filter
+        if ($request->has('search')) {
+            $filters['search'] = $request->input('search');
+        }
+
         return $filters;
     }
 

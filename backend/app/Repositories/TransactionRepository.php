@@ -32,6 +32,23 @@ class TransactionRepository
             $query->where('item_id', $filters['item_id']);
         }
 
+        // Search by buyer name, seller name, or item name
+        if (isset($filters['search']) && !empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('buyer', function ($bq) use ($search) {
+                    $bq->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('seller', function ($sq) use ($search) {
+                    $sq->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('item', function ($iq) use ($search) {
+                    $iq->where('item_name', 'like', "%{$search}%")
+                       ->orWhere('item_code', 'like', "%{$search}%");
+                });
+            });
+        }
+
         return $query;
     }
 
@@ -112,10 +129,38 @@ class TransactionRepository
 
     public function getUserTypeDistribution(array $filters = []): array
     {
-        $query = $this->getQuery($filters);
+        $query = Transaction::query()
+            ->join('users as buyers', 'transactions.buyer_id', '=', 'buyers.id');
+
+        // Apply date filters
+        if (isset($filters['start_date']) && isset($filters['end_date'])) {
+            $query->whereBetween('transactions.created_at', [
+                $filters['start_date'],
+                $filters['end_date']
+            ]);
+        }
+
+        // Apply user_type filter on the joined users table
+        if (isset($filters['user_type'])) {
+            $query->where('buyers.type', $filters['user_type']);
+        }
+
+        // Apply item_id filter
+        if (isset($filters['item_id'])) {
+            $query->where('transactions.item_id', $filters['item_id']);
+        }
+
+        // Apply buyer_id filter
+        if (isset($filters['buyer_id'])) {
+            $query->where('transactions.buyer_id', $filters['buyer_id']);
+        }
+
+        // Apply seller_id filter
+        if (isset($filters['seller_id'])) {
+            $query->where('transactions.seller_id', $filters['seller_id']);
+        }
 
         return $query
-            ->join('users as buyers', 'transactions.buyer_id', '=', 'buyers.id')
             ->select('buyers.type')
             ->selectRaw('COUNT(*) as count')
             ->selectRaw('SUM(transactions.quantity * transactions.price) as revenue')
