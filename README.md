@@ -52,6 +52,7 @@ Laravel 12 + React Analytics Dashboard for transaction analytics.
 4. **Access the application**
    - Frontend: http://localhost:8080
    - API: http://localhost:8080/api/v1
+   - API Docs: http://localhost:8080/api/docs
 
 ### Using Makefile
 
