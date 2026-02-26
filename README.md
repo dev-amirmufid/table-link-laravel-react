@@ -80,6 +80,9 @@ make shell
 
 # View logs
 make logs
+
+# Generate API docs
+make docs
 ```
 
 ## API Endpoints

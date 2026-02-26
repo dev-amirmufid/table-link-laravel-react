@@ -14,6 +14,7 @@ help:
 	@echo "  make logs-backend - View backend container logs"
 	@echo "  make logs-mysql   - View MySQL container logs"
 	@echo "  make migrate      - Run database migrations"
+	@echo "  make docs         - Generate API documentation"
 	@echo "  make seed         - Seed database with sample data"
 	@echo "  make fresh        - Fresh migrate + seed database"
 	@echo "  make shell        - Enter backend container shell"
@@ -48,6 +49,9 @@ seed:
 
 fresh:
 	docker exec tablelink_backend php artisan migrate:fresh --seed --force
+
+docs:
+	docker exec tablelink_backend php artisan l5-swagger:generate
 
 shell:
 	docker exec -it tablelink_backend sh
