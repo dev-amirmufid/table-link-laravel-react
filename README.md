@@ -109,15 +109,6 @@ GET /api/v1/transactions
 GET /api/v1/transactions/{id}
 ```
 
-### Authentication
-
-```
-POST /api/v1/auth/login
-POST /api/v1/auth/logout
-GET  /api/v1/auth/me
-POST /api/v1/auth/refresh
-```
-
 ## Project Structure
 
 ```
