@@ -151,8 +151,6 @@ See the `/docs` folder for detailed documentation:
 - [Performance](docs/PERFORMANCE.md)
 - [Frontend Dashboard](docs/FRONTEND_DASHBOARD.md)
 - [Charts & Analytics](docs/CHARTS_AND_ANALYTICS.md)
-- [Assumptions](docs/ASSUMPTIONS.md)
-- [Limitations](docs/LIMITATIONS.md)
 
 ## Configuration
 
